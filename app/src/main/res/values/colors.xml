@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#EEF3FA</color>
+    <color name="hpa_status_bar">#4F46E5</color>
+    <color name="hpa_window_bg">#EEF2F9</color>
+</resources>

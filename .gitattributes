@@ -1,0 +1,4 @@
+*.jar binary
+*.png binary
+*.ttf binary
+*.wasm binary

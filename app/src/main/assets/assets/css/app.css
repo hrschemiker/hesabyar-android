@@ -1,0 +1,84 @@
+/* HesabYar desktop — fonts (IRANSansX FaNum + Gramophone) and brand overrides */
+
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-Thin.ttf') format('truetype'); font-weight: 100; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-UltraLight.ttf') format('truetype'); font-weight: 200; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-Light.ttf') format('truetype'); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-DemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-ExtraBold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'IRANSansXFaNum'; src: url('/assets/fonts/IRANSansXFaNum-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Gramophone'; src: url('/assets/fonts/GramophoneFaNum-Clean.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
+
+/* The bundled hpa.css (shared with the WordPress plugin) references a font family
+   named "HPAIranSans" whose URLs point at another plugin's folder that does not
+   exist in the desktop app. Re-map HPAIranSans to the bundled IRANSansX files so
+   every element that hpa.css styles with it renders correctly. app.css is loaded
+   AFTER hpa.css so these declarations win over the broken ones. */
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-Thin.ttf') format('truetype'); font-weight: 100; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-UltraLight.ttf') format('truetype'); font-weight: 200; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-Light.ttf') format('truetype'); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-DemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-ExtraBold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'HPAIranSans'; src: url('/assets/fonts/IRANSansXFaNum-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+
+html, body { margin: 0; padding: 0; background: #eef2f9; }
+/* Force IRANSansX everywhere. hpa.css styles most elements with its own
+   "HPAIranSans" family whose files are missing in the desktop app, so we both
+   re-map that family (above) AND override the font stack here to IRANSansXFaNum
+   — which is bundled and loads cleanly. app.css is linked AFTER hpa.css, so these
+   rules win. The list explicitly covers native selects/options plus the date-picker
+   and step-wizard overlays that hpa.css appends to <body> (outside .hpa-app). */
+* { font-family: 'IRANSansXFaNum', 'Segoe UI', Tahoma, sans-serif !important; }
+.hpa-app, .hpa-app *,
+.hpa-app input, .hpa-app select, .hpa-app option, .hpa-app optgroup, .hpa-app textarea, .hpa-app button,
+input, select, option, optgroup, textarea, button,
+.hpa-jdp, .hpa-jdp *,
+.hpa-transaction-wizard, .hpa-transaction-wizard *,
+.hpa-asset-wizard, .hpa-asset-wizard *,
+.hpa-mobile-wizard-launch, .hpa-mobile-asset-wizard-launch, .hpa-wizard-final-submit, .hpa-toast {
+  font-family: 'IRANSansXFaNum', 'Segoe UI', Tahoma, sans-serif !important;
+}
+
+/* Brand block in the top bar */
+.hpa-brand { display: flex; align-items: center; gap: 10px; }
+.hpa-brand-logo { display: inline-flex; }
+.hpa-brand-logo img { width: 40px; height: 40px; display: block; }
+.hpa-brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.hpa-brand-text strong { font-family: 'Gramophone', 'IRANSansXFaNum', sans-serif !important; font-size: 22px; letter-spacing: .3px; }
+.hpa-brand-text span { font-size: 12px; opacity: .8; }
+
+.hpa-auth-logo img { display: block; margin: 0 auto; }
+
+/* Settings extras */
+.hpa-settings-subhead { margin: 18px 0 6px; font-size: 15px; }
+.hpa-sync-status { font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 999px; }
+.hpa-sync-status.is-on { color: #047857; background: #d1fae5; }
+.hpa-sync-status.is-off { color: #6b7280; background: #e5e7eb; }
+.hpa-sync-actions { flex-wrap: wrap; gap: 8px; }
+.hpa-sync-result { margin-top: 10px; padding: 10px 12px; background: #f1f5f9; border-radius: 12px; }
+.hpa-about-card { text-align: center; }
+
+/* Archive section */
+.hpa-archive-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin: 10px 0 14px; }
+.hpa-archive-groups .hpa-checkline { border: 1px solid var(--line, #e2e8f0); border-radius: 12px; padding: 10px 12px; background: #fff; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.hpa-archive-groups .hpa-archive-all { grid-column: 1 / -1; background: #eef2ff; border-color: #c7d2fe; }
+.hpa-btn-danger { background: #fef2f2 !important; color: #dc2626 !important; border: 1px solid #fecaca !important; font-weight: 800; }
+.hpa-btn-danger:hover { background: #fee2e2 !important; }
+
+/* keep app from feeling cramped in a desktop window */
+.hpa-main { max-width: 1180px; margin: 0 auto; }
+
+/* #6 — the tab title/summary must span full width (and stay centered) at every
+   window size. .hpa-main is a CSS grid; force its items to stretch so the
+   identity box doesn't shrink to content and drift right in narrow/mobile mode. */
+.hpa-main { justify-items: stretch !important; }
+.hpa-main > * { justify-self: stretch !important; }
+.hpa-tab-identity, .hpa-tab-sticky-summary { width: auto !important; box-sizing: border-box; }
+@media (max-width: 860px) {
+  .hpa-tab-identity { margin-left: 0 !important; margin-right: 0 !important; }
+}

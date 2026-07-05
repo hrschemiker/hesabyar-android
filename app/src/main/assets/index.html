@@ -8,6 +8,20 @@
   <link rel="stylesheet" href="/assets/css/hpa.css">
   <link rel="stylesheet" href="/assets/css/app.css">
   <style>#hpa-boot{padding:44px 20px;text-align:center;font-family:'IRANSansXFaNum',Tahoma,sans-serif;color:#475569}#hpa-boot img{width:72px;height:72px;opacity:.9;margin-bottom:12px}</style>
+  <script>
+    /* Safe-area insets: MainActivity calls this with the system bar / cutout sizes
+       (already converted to CSS px) so the app never draws under the status bar or
+       the navigation/back-home bar. Defined here — before any module loads — so the
+       native side can call it at any point during startup. Values persist on the
+       root element across the full-page reloads the SPA router uses. */
+    window.__applyInsets = function (t, r, b, l) {
+      var s = document.documentElement.style;
+      s.setProperty('--hpa-inset-top', (t || 0) + 'px');
+      s.setProperty('--hpa-inset-right', (r || 0) + 'px');
+      s.setProperty('--hpa-inset-bottom', (b || 0) + 'px');
+      s.setProperty('--hpa-inset-left', (l || 0) + 'px');
+    };
+  </script>
 </head>
 <body>
   <div id="hpa-root"><div id="hpa-boot"><img src="/assets/img/logo.svg" alt=""><div>در حال بارگذاری حساب‌یار…</div></div></div>

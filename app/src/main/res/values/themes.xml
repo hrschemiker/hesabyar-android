@@ -2,7 +2,11 @@
 <resources>
     <style name="Theme.HesabYar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/hpa_window_bg</item>
-        <item name="android:statusBarColor">@color/hpa_status_bar</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <!-- Edge-to-edge: keep the system bars transparent so the light app
+             background shows through; MainActivity pads the content by the inset
+             sizes and sets dark (light-appearance) bar icons. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

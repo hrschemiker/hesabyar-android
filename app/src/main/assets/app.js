@@ -57,6 +57,7 @@ function dispatchAction(action, post) {
   }
   var tab = CORE.handleAction(action, post, {}); // files not uploaded from phone in v1
   DB.save();
+  try { localStorage.setItem('hpa_dirty', '1'); } catch (e) {} // mark for background push on next load
   goTab(tab, { hpa_msg: 'saved' });
   return Promise.resolve(tab);
 }
@@ -90,13 +91,20 @@ function onSubmit(e) {
   go(post);
 }
 
-// ---- background sync (data flows phone <-> site <-> desktop) ----
+// ---- background sync (data flows phone <-> site <-> desktop, invisibly) ----
+// Runs on every screen load. If a local change was just made ('dirty'), it pushes
+// immediately; otherwise it only pulls at most once every 45s to stay light.
+// The dirty flag lives in localStorage, so a change made before the app was closed
+// mid-sync is still pushed on the next open (pull first, then push — full sync).
 function backgroundSync() {
   var s = SYNC.getSync();
   if (!s.enabled || !s.token) return;
-  var now = Date.now();
-  try { var last = parseInt(sessionStorage.getItem('hpa_last_sync') || '0', 10); if (now - last < 90000) return; sessionStorage.setItem('hpa_last_sync', String(now)); } catch (e) {}
-  SYNC.autoSync().then(function () { DB.save(); }).catch(function () {});
+  var dirty = false; try { dirty = localStorage.getItem('hpa_dirty') === '1'; } catch (e) {}
+  var now = Date.now(); var last = 0;
+  try { last = parseInt(sessionStorage.getItem('hpa_last_sync') || '0', 10); } catch (e) {}
+  if (!dirty && (now - last) < 45000) return;
+  try { sessionStorage.setItem('hpa_last_sync', String(now)); } catch (e) {}
+  SYNC.autoSync().then(function (res) { DB.save(); if (res && res.ok) { try { localStorage.removeItem('hpa_dirty'); } catch (e) {} } }).catch(function () {});
 }
 
 function start() {

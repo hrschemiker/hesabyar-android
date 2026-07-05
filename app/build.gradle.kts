@@ -11,8 +11,8 @@ android {
         applicationId = "app.hesabyar"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
     }
 
     buildTypes {
@@ -32,6 +32,8 @@ android {
 }
 
 dependencies {
+    // WindowCompat / WindowInsetsCompat / ViewCompat come from androidx.core:core,
+    // pulled in transitively by appcompat below — no extra dependency needed.
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.webkit:webkit:1.11.0")
 }

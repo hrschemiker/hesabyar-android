@@ -15,6 +15,9 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
 import java.io.File
 
@@ -22,6 +25,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private val dbFile: File by lazy { File(filesDir, "hesabyar.sqlite") }
+    // last window insets in CSS px, so we can re-apply after every page (re)load
+    private var insetTop = 0; private var insetRight = 0; private var insetBottom = 0; private var insetLeft = 0
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +38,22 @@ class MainActivity : AppCompatActivity() {
 
         webView = WebView(this)
         setContentView(webView)
+
+        // Edge-to-edge: draw behind the system bars, then feed their sizes to the web
+        // layer as CSS vars so nothing is hidden under the status bar or the
+        // navigation / back-home bar (the Samsung overlap issue). targetSdk 35 forces
+        // edge-to-edge anyway, so we opt in explicitly and handle the insets ourselves.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, webView).isAppearanceLightStatusBars = true
+        WindowCompat.getInsetsController(window, webView).isAppearanceLightNavigationBars = true
+        ViewCompat.setOnApplyWindowInsetsListener(webView) { _, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val d = resources.displayMetrics.density
+            insetTop = (bars.top / d).toInt(); insetRight = (bars.right / d).toInt()
+            insetBottom = (bars.bottom / d).toInt(); insetLeft = (bars.left / d).toInt()
+            applyInsetsToWeb()
+            insets
+        }
 
         webView.settings.apply {
             javaScriptEnabled = true
@@ -49,6 +70,9 @@ class MainActivity : AppCompatActivity() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
                 return assetLoader.shouldInterceptRequest(request.url)
             }
+            override fun onPageFinished(view: WebView, url: String?) {
+                applyInsetsToWeb() // the SPA reloads the page on navigation; re-apply each time
+            }
         }
 
         webView.addJavascriptInterface(HesabYarBridge(), "HesabYar")
@@ -63,6 +87,11 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             webView.loadUrl("https://appassets.androidplatform.net/index.html?hpa_tab=dashboard")
         }
+    }
+
+    private fun applyInsetsToWeb() {
+        val js = "window.__applyInsets && window.__applyInsets($insetTop,$insetRight,$insetBottom,$insetLeft)"
+        webView.evaluateJavascript(js, null)
     }
 
     override fun onSaveInstanceState(outState: Bundle) { super.onSaveInstanceState(outState); webView.saveState(outState) }

@@ -41,6 +41,13 @@ Everything the web/desktop app has, in your pocket:
 - 💱 **Rates** (TGJU) · 🗄️ **Archive** a period (+ PDF) · ♻️ recycle bin · 🔒 PIN lock.
 - Jalali calendar & Persian numerals throughout, same **IRANSansX** + **Gramophone** fonts.
 
+## 🆕 New in 1.3.0
+
+- **🎨 Full mockup-matched redesign — every screen.** Bespoke purple hero cards on **accounts** (count + total), **debts** (total + nearest due + overdue/paid/this‑month status cards), and a brand‑new **budget** overview — all consistent with the dashboard.
+- **🎯 Budget screen with category rings.** Set a monthly limit per category and watch animated progress rings show spend‑vs‑limit, alongside total assets, total receivables, and asset/receivable breakdowns.
+- **📊 New charts + Excel export.** A monthly **cash‑flow** chart (in vs out) in Reports, plus one‑tap **Excel (CSV)** export of all transactions (UTF‑8, opens cleanly in Excel) next to PDF and JSON backup.
+- **🧾 Smarter transactions screen.** Type filter tabs (all / income / expense / transfer), a live **today** summary (income · expense · net), and a quick add‑transaction banner above the clean inline form.
+
 ## 🆕 New in 1.2.0
 
 - **🎨 Redesigned mobile UI.** A refreshed, cohesive look across the app: a purple **موجودی کل** balance hero with a 3D wallet, four colour-coded quick actions (expense · income · transfer · new invoice), softer cards with consistent spacing, and a floating‑action bottom bar with a raised centre **＋**.

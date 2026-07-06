@@ -187,6 +187,62 @@ function get_categories(type) {
   const where = type ? D.all('SELECT * FROM hpa_categories WHERE type=? ORDER BY is_default DESC, id DESC', [type]) : D.all('SELECT * FROM hpa_categories ORDER BY is_default DESC, id DESC');
   return where;
 }
+// ---------- budget (per-category monthly limits, stored as an option) ----------
+function category_budgets() { const b = D.getOption('hpa_category_budgets', {}); return (b && typeof b === 'object') ? b : {}; }
+function save_budgets(post) {
+  const b = {};
+  for (const k in post) { const m = /^budget_(\d+)$/.exec(k); if (m) { const v = U.absint(post[k]); if (v > 0) b[m[1]] = v; } }
+  D.setOption('hpa_category_budgets', b); return 'budget';
+}
+function budget_ring(pct, color, label, sub) {
+  pct = Math.max(0, Math.min(999, Math.round(pct)));
+  const r = 26, c = 2 * Math.PI * r, shown = Math.min(100, pct), off = c * (1 - shown / 100);
+  return '<div class="hpa-bring"><svg viewBox="0 0 64 64" class="hpa-bring-svg"><circle class="hpa-bring-bg" cx="32" cy="32" r="' + r + '"></circle><circle class="hpa-bring-fg" cx="32" cy="32" r="' + r + '" stroke="' + U.esc_attr(color) + '" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"></circle></svg><span class="hpa-bring-pct">' + U.esc_html(U.number_format_i18n(pct)) + '٪</span><b>' + U.esc_html(label) + '</b><small>' + U.esc_html(sub) + '</small></div>';
+}
+function view_budget() {
+  const range = current_jalali_month_gregorian_range();
+  const cats = get_categories('expense');
+  const budgets = category_budgets();
+  let rows = [], totalLimit = 0, totalSpent = 0;
+  for (const c of cats) {
+    const spent = transaction_sum_toman(expense_types(), "category_id=" + Number(c.id) + " AND gregorian_date BETWEEN '" + range[0] + "' AND '" + range[1] + "'");
+    const limit = Number(budgets[c.id]) || 0;
+    totalLimit += limit; totalSpent += spent;
+    rows.push({ c, spent, limit });
+  }
+  const monthlyBudget = totalLimit > 0 ? totalLimit : transaction_sum_toman('income', "gregorian_date BETWEEN '" + range[0] + "' AND '" + range[1] + "'");
+  const remaining = monthlyBudget - totalSpent;
+  const pct = monthlyBudget > 0 ? Math.min(100, Math.round(totalSpent * 100 / monthlyBudget)) : 0;
+  const assetsTotal = asset_summary_totals().current;
+  const recvTotal = table_sum_toman('receivables', 'amount', "status!='paid'");
+  // hero: monthly budget + progress
+  let out = '<section class="hpa-budget-hero hpa-hero-media" style="background-image:url(/assets/img/heroes/budget.webp)"><div class="hpa-budget-hero-in"><div class="hpa-budget-hero-head"><small>بودجهٔ ماهانه</small><b>' + U.esc_html(fmt_money(monthlyBudget, 'toman')) + '</b></div><div class="hpa-budget-bar"><span style="width:' + pct + '%"></span><em>' + U.esc_html(U.number_format_i18n(pct)) + '٪</em></div><div class="hpa-budget-hero-foot"><div><small>باقی‌مانده</small><b class="' + (remaining >= 0 ? 'hpa-pos' : 'hpa-neg') + '">' + U.esc_html(fmt_money(Math.abs(remaining), 'toman')) + '</b></div><div><small>مصرف‌شده</small><b>' + U.esc_html(fmt_money(totalSpent, 'toman')) + '</b></div></div></div></section>';
+  // assets + receivables summary cards
+  out += '<section class="hpa-budget-two"><a class="hpa-budget-sum hpa-budget-sum-asset" href="' + U.esc_url(buildUrl({ hpa_tab: 'assets' })) + '"><span class="hpa-budget-sum-ic">💰</span><small>کل دارایی‌ها</small><b>' + U.esc_html(fmt_money(assetsTotal, 'toman')) + '</b></a><a class="hpa-budget-sum hpa-budget-sum-recv" href="' + U.esc_url(buildUrl({ hpa_tab: 'receivable' })) + '"><span class="hpa-budget-sum-ic">🤝</span><small>کل طلب‌ها</small><b>' + U.esc_html(fmt_money(recvTotal, 'toman')) + '</b></a></section>';
+  // category budget rings (top 6 by spend)
+  const ringRows = rows.slice().sort((a, b) => b.spent - a.spent).slice(0, 6).filter(r => r.spent > 0 || r.limit > 0);
+  const palette = ['#6c4ce0', '#16c784', '#f5476b', '#f59e0b', '#3b82f6', '#06b6d4'];
+  out += '<section class="hpa-card hpa-budget-rings-card"><div class="hpa-section-head"><div><h2>دسته‌بندی بودجه</h2><p class="hpa-muted">مصرف هر دسته نسبت به سقف/بودجه این ماه</p></div></div><div class="hpa-budget-rings">';
+  if (!ringRows.length) out += '<p class="hpa-muted">هنوز هزینه‌ای در این ماه ثبت نشده است.</p>';
+  ringRows.forEach((r, i) => { const denom = r.limit > 0 ? r.limit : (monthlyBudget || 1); const rp = denom > 0 ? (r.spent * 100 / denom) : 0; out += budget_ring(rp, palette[i % palette.length], (r.c.icon || '') + ' ' + r.c.name, fmt_money(r.spent, 'toman')); });
+  out += '</div></section>';
+  // set-budget form
+  out += '<details class="hpa-card hpa-budget-set"><summary>⚙️ تنظیم سقف بودجهٔ دسته‌ها</summary>' + form_open('hpa_save_budgets') + '<div class="hpa-form-grid">';
+  for (const c of cats) out += '<label>' + U.esc_html((c.icon || '') + ' ' + c.name) + '<input name="budget_' + Number(c.id) + '" inputmode="decimal" value="' + U.esc_attr(Number(budgets[c.id]) || '') + '" placeholder="بدون سقف"></label>';
+  out += '</div>' + form_close('ذخیره سقف‌ها') + '</details>';
+  // asset breakdown + receivables list
+  const groups = asset_groups();
+  const aGroups = D.all("SELECT asset_group, SUM(purchase_price) s FROM hpa_assets WHERE is_active=1 GROUP BY asset_group");
+  out += '<section class="hpa-budget-two-lists"><div class="hpa-card"><h3>بخش‌بندی دارایی‌ها</h3>';
+  if (!aGroups.length) out += '<p class="hpa-muted">دارایی ثبت نشده است.</p>';
+  for (const g of aGroups) out += '<div class="hpa-list-row"><span class="hpa-badge">' + U.esc_html(asset_group_icon(g.asset_group)) + '</span><b>' + U.esc_html(groups[g.asset_group] || g.asset_group) + '</b><em>' + U.esc_html(fmt_money(g.s, 'toman')) + '</em></div>';
+  out += '</div><div class="hpa-card"><h3>طلب‌ها</h3>';
+  const recvs = D.all("SELECT * FROM hpa_receivables WHERE status!='paid' ORDER BY due_gregorian_date ASC LIMIT 6");
+  if (!recvs.length) out += '<p class="hpa-muted">طلب بازی نیست.</p>';
+  for (const r of recvs) out += '<div class="hpa-list-row"><b>' + U.esc_html(r.person_name) + '<small>' + U.esc_html(r.note || '') + ' · ' + U.esc_html(r.due_jalali_date || '') + '</small></b><em>' + U.esc_html(fmt_money(r.amount, r.currency)) + '</em></div>';
+  out += '<a class="hpa-btn hpa-btn-ghost" href="' + U.esc_url(buildUrl({ hpa_tab: 'receivable' })) + '">همهٔ طلب‌ها ›</a></div></section>';
+  return out;
+}
 function account_select(name, selected) {
   name = name || 'account_id'; selected = Number(selected) || 0;
   let out = '<select name="' + U.esc_attr(name) + '"><option value="0">انتخاب حساب</option>';
@@ -980,14 +1036,14 @@ function save_uploads(files, field, objectType, objectId) {
 
 // ================= VIEW: chrome =================
 function topbar(active) {
-  const tabs = { dashboard: 'داشبورد', accounts: 'حساب‌ها', transactions: 'تراکنش‌ها', categories: 'موضوعات', debt: 'بدهی', receivable: 'طلب', assets: 'دارایی‌ها', reports: 'گزارش‌ها', rates: 'نرخ‌ها', settings: 'تنظیمات' };
-  const icons = { dashboard: '🏠', accounts: '💳', transactions: '↔️', categories: '🏷️', debt: '📉', receivable: '📈', assets: '💰', reports: '📊', rates: '⚙️', settings: '🔧' };
+  const tabs = { dashboard: 'داشبورد', accounts: 'حساب‌ها', transactions: 'تراکنش‌ها', categories: 'موضوعات', debt: 'بدهی', receivable: 'طلب', assets: 'دارایی‌ها', budget: 'بودجه', reports: 'گزارش‌ها', rates: 'نرخ‌ها', settings: 'تنظیمات' };
+  const icons = { dashboard: '🏠', accounts: '💳', transactions: '↔️', categories: '🏷️', debt: '📉', receivable: '📈', assets: '💰', budget: '🎯', reports: '📊', rates: '⚙️', settings: '🔧' };
   let out = '<header class="hpa-top"><div class="hpa-brand"><span class="hpa-brand-logo"><img src="/assets/img/logo.svg" alt="' + U.esc_attr(APP_NAME) + '"></span><div class="hpa-brand-text"><strong>' + U.esc_html(APP_NAME) + '</strong><span>' + U.esc_html(APP_SUBTITLE) + '</span></div></div><nav class="hpa-desktop-nav">';
   for (const k in tabs) out += '<a class="' + (active === k ? 'is-active' : '') + '" href="' + U.esc_url(buildUrl({ hpa_tab: k })) + '"><span class="hpa-nav-ico">' + U.esc_html(icons[k]) + '</span><span>' + U.esc_html(tabs[k]) + '</span></a>';
   out += '</nav></header><nav class="hpa-mobile-nav" aria-label="منوی حسابداری شخصی">';
   // خانه · تراکنش‌ها · [ + FAB ] · دارایی‌ها · گزارش‌ها  (RTL: home on the right)
   const navLeft = { dashboard: 'خانه', transactions: tabs.transactions };
-  const navRight = { assets: tabs.assets, reports: tabs.reports };
+  const navRight = { budget: tabs.budget, reports: tabs.reports };
   for (const k in navLeft) out += '<a class="hpa-nav-item ' + (active === k ? 'is-active' : '') + '" href="' + U.esc_url(buildUrl({ hpa_tab: k })) + '"><span class="hpa-nav-ico">' + U.esc_html(icons[k]) + '</span><span>' + U.esc_html(navLeft[k]) + '</span></a>';
   out += '<a class="hpa-nav-fab" href="' + U.esc_url(buildUrl({ hpa_tab: 'transactions' })) + '" aria-label="ثبت تراکنش جدید"><span>＋</span></a>';
   for (const k in navRight) out += '<a class="hpa-nav-item ' + (active === k ? 'is-active' : '') + '" href="' + U.esc_url(buildUrl({ hpa_tab: k })) + '"><span class="hpa-nav-ico">' + U.esc_html(icons[k]) + '</span><span>' + U.esc_html(navRight[k]) + '</span></a>';
@@ -1003,6 +1059,7 @@ function tab_header(active) {
     debt: ['بدهی و تعهدات', 'وام، اقساط، چک، بدهی‌های تکرارشونده و تعهدات آینده', '📉'],
     receivable: ['طلب‌ها', 'مدیریت طلب‌ها، وصول کامل و وصول جزئی', '📈'],
     assets: ['دارایی‌ها', 'دارایی، هدف مالی، ارزش فعلی و سود/زیان', '💰'],
+    budget: ['بودجه / دارایی‌ها / طلب‌ها', 'نمای کلی بودجهٔ ماهانه، دارایی‌ها و طلب‌ها', '🎯'],
     reports: ['گزارش‌ها', 'تحلیل مالی، نمودارها و گزارش‌های تصمیم‌ساز', '📊'],
     rates: ['نرخ‌ها', 'نرخ ارز، طلا و کریپتو با به‌روزرسانی خودکار', '⚙️'],
     settings: ['تنظیمات', 'ظاهر، اشخاص، امنیت و اتصال به سایت', '🔧']
@@ -1145,7 +1202,18 @@ function view_accounts() {
   const editId = U.absint(CTX.query.hpa_edit_account);
   const edit = editId ? D.get('SELECT * FROM hpa_accounts WHERE id=?', [editId]) : null;
   const isEdit = !!edit;
-  let out = '<details class="hpa-card hpa-account-form-details' + (isEdit ? ' hpa-editing' : '') + '"' + (isEdit ? ' open' : '') + '><summary class="hpa-account-form-summary">' + (isEdit ? '✏️ ویرایش حساب' : '➕ ثبت حساب جدید') + '</summary>';
+  const activeAccounts = get_accounts();
+  const totalBalToman = total_balances_toman(balances);
+  // summary: count card (over accounts illustration) + total balance card — matches the design
+  let out = '<section class="hpa-acc-summary">'
+    + '<div class="hpa-acc-count hpa-hero-media" style="background-image:url(/assets/img/heroes/accounts.webp)"><div class="hpa-acc-count-in"><small>تعداد حساب‌ها</small><b>' + U.esc_html(U.number_format_i18n(activeAccounts.length)) + '</b><span>حساب فعال</span></div></div>'
+    + '<div class="hpa-acc-total"><span class="hpa-acc-total-ic">📊</span><small>مجموع موجودی حساب‌ها</small><b>' + U.esc_html(fmt_money(totalBalToman, 'toman')) + '</b></div>'
+    + '</section>';
+  out += '<section class="hpa-acc-actions">'
+    + '<a class="hpa-acc-action hpa-acc-action-transfer" href="' + U.esc_url(buildUrl({ hpa_tab: 'transactions', hpa_new_type: 'transfer' })) + '"><span>🔁</span>انتقال بین حساب‌ها</a>'
+    + '<a class="hpa-acc-action hpa-acc-action-add" href="#hpa-new-account"><span>➕</span>افزودن حساب جدید</a>'
+    + '</section>';
+  out += '<details id="hpa-new-account" class="hpa-card hpa-account-form-details' + (isEdit ? ' hpa-editing' : '') + '"' + (isEdit ? ' open' : '') + '><summary class="hpa-account-form-summary">' + (isEdit ? '✏️ ویرایش حساب' : '➕ ثبت حساب جدید') + '</summary>';
   out += form_open('hpa_save_account');
   if (isEdit) out += '<input type="hidden" name="id" value="' + U.esc_attr(edit.id) + '">';
   const name = isEdit ? edit.name : ''; const person = isEdit ? (edit.person_key || 'hamidreza') : 'hamidreza'; const type = isEdit ? edit.type : 'cash'; const currency = isEdit ? edit.currency : 'toman';
@@ -1166,8 +1234,8 @@ function view_accounts() {
     const bal = Number(balances[r.id] !== undefined ? balances[r.id] : r.opening_balance) || 0;
     const bg = r.color || '#ede9fe';
     out += '<details class="hpa-account-card"><summary style="background:' + U.esc_attr(bg) + '">';
-    out += '<span class="hpa-account-card-icon">' + U.esc_html(r.icon || '💳') + '</span>';
-    out += '<div class="hpa-account-card-info"><strong>' + U.esc_html(r.name) + '</strong><small>' + U.esc_html(person_label(r.person_key || 'hamidreza')) + ' · ' + U.esc_html(types[r.type] || r.type) + '</small></div>';
+    out += '<span class="hpa-account-card-icon">' + account_icon_html(r.icon) + '</span>';
+    out += '<div class="hpa-account-card-info"><strong>' + U.esc_html(r.name) + '</strong><small>' + U.esc_html(account_type_label(r) + ' · ' + person_label(r.person_key || 'hamidreza')) + '</small></div>';
     out += '<span class="hpa-account-card-balance">' + U.esc_html(fmt_money(bal, r.currency)) + '</span></summary>';
     out += '<div class="hpa-account-card-body"><div class="hpa-account-card-details">';
     out += '<div><span>ارز</span><strong>' + U.esc_html(curr[r.currency] || r.currency) + '</strong></div>';
@@ -1268,7 +1336,19 @@ function view_transactions() {
   if (isEdit) existingItems = D.all('SELECT name, amount FROM hpa_transaction_items WHERE transaction_id=? ORDER BY id', [edit.id]).map(r => ({ name: r.name, amount: r.amount }));
   let out = '';
   if (DUP_WARNING) { out += '<section class="hpa-card hpa-alert hpa-alert-warning"><strong>هشدار تراکنش تکراری</strong><p>تراکنشی با همین مبلغ، حساب، تاریخ، نوع و توضیح قبلاً ثبت شده است. برای جلوگیری از ثبت اشتباه، عملیات ذخیره انجام نشد.</p><small>شناسه تراکنش مشابه: ' + U.esc_html(DUP_WARNING) + '</small></section>'; DUP_WARNING = 0; }
-  out += '<section class="hpa-card hpa-transaction-form-card ' + (isEdit ? 'hpa-editing' : 'hpa-creating') + '"><h2>' + (isEdit ? 'ویرایش تراکنش' : 'ثبت تراکنش') + '</h2>' + form_open('hpa_save_transaction', true);
+  // filter tabs (همه / درآمد / هزینه / انتقال)
+  const ftype = CTX.query.hpa_type || '';
+  const ftab = (key, label) => '<a class="hpa-tx-ftab' + (ftype === key ? ' is-active' : '') + '" href="' + U.esc_url(buildUrl({ hpa_tab: 'transactions', hpa_type: key }, ['hpa_type'])) + '">' + U.esc_html(label) + '</a>';
+  out += '<section class="hpa-tx-ftabs">' + ftab('', 'همه') + ftab('income', 'درآمد') + ftab('expense', 'هزینه') + ftab('transfer', 'انتقال') + '</section>';
+  // today summary
+  const todayG = U.today_gregorian();
+  const tIncome = transaction_sum_toman('income', "gregorian_date='" + todayG + "'");
+  const tExpense = transaction_sum_toman(expense_types(), "gregorian_date='" + todayG + "'");
+  const tNet = tIncome - tExpense;
+  out += '<section class="hpa-tx-today"><div class="hpa-tx-today-item hpa-tx-in"><small>درآمد</small><b>+' + U.esc_html(fmt_money(tIncome, 'toman')) + '</b></div><div class="hpa-tx-today-item hpa-tx-out"><small>هزینه</small><b>−' + U.esc_html(fmt_money(tExpense, 'toman')) + '</b></div><div class="hpa-tx-today-item hpa-tx-net"><small>خالص</small><b>' + (tNet >= 0 ? '+' : '−') + U.esc_html(fmt_money(Math.abs(tNet), 'toman')) + '</b></div></section>';
+  // add-transaction banner
+  out += '<a class="hpa-tx-banner hpa-hero-media" style="background-image:url(/assets/img/heroes/add-tx.webp)" href="#hpa-tx-form"><div class="hpa-tx-banner-in"><b>ثبت تراکنش جدید</b><small>افزودن درآمد، هزینه یا انتقال</small></div></a>';
+  out += '<section id="hpa-tx-form" class="hpa-card hpa-transaction-form-card ' + (isEdit ? 'hpa-editing' : 'hpa-creating') + '"><h2>' + (isEdit ? 'ویرایش تراکنش' : 'ثبت تراکنش') + '</h2>' + form_open('hpa_save_transaction', true);
   if (isEdit) out += '<input type="hidden" name="id" value="' + U.esc_attr(edit.id) + '">';
   const payInstId = U.absint(CTX.query.hpa_pay_loan);
   const payInst = payInstId ? get_installment(payInstId) : null;
@@ -1345,6 +1425,12 @@ function transactions_filter_ui() {
 function transactions_table(limit) {
   limit = U.absint(limit);
   const where = ['1=1']; const params = [];
+  if (CTX.query.hpa_type) {
+    const ft = String(CTX.query.hpa_type);
+    if (ft === 'income') { where.push('t.type=?'); params.push('income'); }
+    else if (ft === 'expense') { const et = expense_types(); where.push('t.type IN (' + et.map(() => '?').join(',') + ')'); params.push(...et); }
+    else if (ft === 'transfer') { where.push("t.type IN ('transfer','person_transfer')"); }
+  }
   if (CTX.query.hpa_category) { where.push('t.category_id=?'); params.push(U.absint(CTX.query.hpa_category)); }
   if (CTX.query.hpa_tag) { where.push('t.tags LIKE ?'); params.push('%' + U.esc_like(String(CTX.query.hpa_tag)) + '%'); }
   if (CTX.query.hpa_q) { const q = '%' + U.esc_like(String(CTX.query.hpa_q)) + '%'; where.push('(t.description LIKE ? OR t.tags LIKE ? OR CAST(t.amount AS TEXT) LIKE ?)'); params.push(q, q, q); }
@@ -1513,7 +1599,29 @@ function view_checks() {
   return out;
 }
 function view_debts_full() {
-  let out = '<section class="hpa-debt-tabs"><div class="hpa-card"><h2>بدهی‌های ساده</h2></div></section>';
+  const today = U.today_gregorian();
+  const range = current_jalali_month_gregorian_range();
+  const totalDebts = table_sum_toman('debts', 'amount', "status!='paid'") + loan_remaining_total_toman() + check_open_total_toman();
+  const overdue = rows_sum_toman(D.all("SELECT amount,currency FROM hpa_loan_installments WHERE status!='paid' AND due_gregorian_date<>'' AND due_gregorian_date<?", [today]))
+    + rows_sum_toman(D.all("SELECT (amount_each*check_count) amount,currency FROM hpa_checks WHERE status!='paid' AND first_due_gregorian_date<>'' AND first_due_gregorian_date<?", [today]))
+    + rows_sum_toman(D.all("SELECT amount,currency FROM hpa_debts WHERE status!='paid' AND due_gregorian_date IS NOT NULL AND due_gregorian_date<>'' AND due_gregorian_date<?", [today]));
+  const paidTotal = rows_sum_toman(D.all("SELECT amount,currency FROM hpa_loan_installments WHERE status='paid'"))
+    + rows_sum_toman(D.all("SELECT (amount_each*check_count) amount,currency FROM hpa_checks WHERE status='paid'"));
+  const paidThisMonth = transaction_sum_toman(financing_out_types(), "gregorian_date BETWEEN '" + range[0] + "' AND '" + range[1] + "'");
+  const near = future_obligation_items(1)[0];
+  let nearHtml = '';
+  if (near) {
+    let days = '';
+    try { const d = Math.round((new Date(near.gdate).getTime() - new Date(today).getTime()) / 86400000); days = d > 0 ? (U.number_format_i18n(d) + ' روز دیگر') : (d === 0 ? 'امروز' : U.number_format_i18n(-d) + ' روز گذشته'); } catch (e) {}
+    const nearTitle = String(near.title || '').replace('قسط: ', '').replace('چک: ', '').replace('تکرارشونده: ', '');
+    nearHtml = '<div class="hpa-debt-hero-due"><div class="hpa-debt-hero-due-info"><small>نزدیک‌ترین سررسید</small><b>' + U.esc_html(nearTitle) + ' — ' + U.esc_html(fmt_money(near.amount, near.currency)) + '</b></div><span class="hpa-debt-hero-days">' + U.esc_html(days) + '</span></div>';
+  }
+  let out = '<section class="hpa-debt-hero hpa-hero-media" style="background-image:url(/assets/img/heroes/debts.webp)"><div class="hpa-debt-hero-in"><div class="hpa-debt-hero-top"><small>مجموع بدهی‌ها</small><b>' + U.esc_html(fmt_money(totalDebts, 'toman')) + '</b></div>' + nearHtml + '</div></section>';
+  out += '<section class="hpa-debt-stats">'
+    + '<div class="hpa-debt-stat hpa-debt-stat-overdue"><div><small>سررسید گذشته</small><b>' + U.esc_html(fmt_money(overdue, 'toman')) + '</b></div><span class="hpa-debt-stat-ic">❗</span></div>'
+    + '<div class="hpa-debt-stat hpa-debt-stat-paid"><div><small>پرداخت‌شده</small><b>' + U.esc_html(fmt_money(paidTotal, 'toman')) + '</b></div><span class="hpa-debt-stat-ic">🕐</span></div>'
+    + '<div class="hpa-debt-stat hpa-debt-stat-month"><div><small>پرداخت این ماه</small><b>' + U.esc_html(fmt_money(paidThisMonth, 'toman')) + '</b></div><span class="hpa-debt-stat-ic">✅</span></div>'
+    + '</section>';
   out += view_debt_like('debts', 'debt', 'بدهی‌ها', 'hpa_save_debt', 'طلبکار');
   out += view_recurring();
   out += view_loans();
@@ -1697,6 +1805,37 @@ function monthly_svg_chart() {
   let x = 104;
   for (const d of data) { const hi = Math.round((d[1] / max) * 190); const he = Math.round((d[2] / max) * 190); svg += '<rect x="' + x + '" y="' + (250 - hi) + '" width="24" height="' + hi + '" rx="6" class="hpa-svg-income"/>'; svg += '<rect x="' + (x + 32) + '" y="' + (250 - he) + '" width="24" height="' + he + '" rx="6" class="hpa-svg-expense"/>'; svg += '<text x="' + (x - 6) + '" y="287" class="hpa-svg-label hpa-svg-month">' + U.esc_html(d[0]) + '</text>'; x += 98; }
   return svg + '<text x="76" y="24" class="hpa-svg-label">سبز: درآمد | بنفش: هزینه — محور عمودی: میلیون تومان</text></svg>';
+}
+// جریان نقدینگی — monthly cash in (up) vs out (down), all money movement
+function cashflow_bars_svg() {
+  const ranges = last_jalali_month_ranges(6);
+  const data = ranges.map(r => ({
+    label: r.label,
+    inn: transaction_sum_toman(cash_in_types(), "gregorian_date BETWEEN '" + r.start + "' AND '" + r.end + "'"),
+    out: transaction_sum_toman(cash_out_types(), "gregorian_date BETWEEN '" + r.start + "' AND '" + r.end + "'")
+  }));
+  const max = Math.max(1, ...data.map(d => Math.max(d.inn, d.out)));
+  const W = 720, H = 300, mid = 150, maxH = 96, step = W / 6;
+  let svg = '<svg class="hpa-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="جریان نقدینگی">';
+  svg += '<line x1="20" y1="' + mid + '" x2="' + (W - 20) + '" y2="' + mid + '" class="hpa-svg-axis"/>';
+  data.forEach((d, i) => {
+    const cx = W - (i * step + step / 2);
+    const inH = Math.round((d.inn / max) * maxH), outH = Math.round((d.out / max) * maxH);
+    svg += '<rect x="' + (cx - 27) + '" y="' + (mid - inH) + '" width="22" height="' + inH + '" rx="6" class="hpa-svg-income"/>';
+    svg += '<rect x="' + (cx + 5) + '" y="' + mid + '" width="22" height="' + outH + '" rx="6" class="hpa-svg-expense"/>';
+    svg += '<text x="' + cx + '" y="' + (H - 10) + '" text-anchor="middle" class="hpa-svg-label hpa-svg-month">' + U.esc_html(d.label) + '</text>';
+  });
+  svg += '<text x="' + (W - 20) + '" y="20" text-anchor="end" class="hpa-svg-label">سبز: ورودی نقدی | قرمز: خروجی نقدی</text>';
+  return svg + '</svg>';
+}
+// CSV (Excel) export of all transactions — BOM prefix so Excel reads UTF-8 Persian correctly
+function export_transactions_csv() {
+  const rows = D.all("SELECT t.jalali_date, t.type, t.amount, t.currency, a.name account, c.name category, t.transaction_place, t.description FROM hpa_transactions t LEFT JOIN hpa_accounts a ON a.id=t.account_id LEFT JOIN hpa_categories c ON c.id=t.category_id WHERE t.status!='cancelled' ORDER BY t.gregorian_date DESC, t.id DESC");
+  const types = transaction_types(); const curr = currencies();
+  const esc = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  let csv = '﻿' + ['تاریخ', 'نوع', 'مبلغ', 'ارز', 'حساب', 'موضوع', 'محل', 'توضیح'].join(',') + '\n';
+  for (const r of rows) csv += [r.jalali_date, types[r.type] || r.type, r.amount, curr[r.currency] || r.currency, r.account || '', r.category || '', r.transaction_place || '', r.description || ''].map(esc).join(',') + '\n';
+  return csv;
 }
 function account_balance_trend_svg() {
   const accounts = get_accounts(); if (!accounts.length) return '<p class="hpa-muted">حسابی ثبت نشده است.</p>';
@@ -1889,6 +2028,7 @@ function view_reports() {
   out += report_financing_summary();
   out += report_person_transfers_shared();
   out += '<section class="hpa-two"><div class="hpa-card"><h2>نمودار هزینه‌ها بر اساس موضوع</h2>' + expense_chart(true) + '</div><div class="hpa-card"><h2>درآمد و هزینه ۶ ماه اخیر</h2>' + monthly_svg_chart() + '</div></section>';
+  out += '<section class="hpa-card hpa-cashflow-card"><div class="hpa-section-head"><div><h2>جریان نقدینگی</h2><p class="hpa-muted">ورود و خروج نقدی ماهانه (شامل همهٔ جابه‌جایی پول)</p></div></div>' + cashflow_bars_svg() + '</section>';
   out += '<section class="hpa-two"><div class="hpa-card"><h2>گزارش حساب‌ها</h2>';
   const accounts = get_accounts();
   if (!accounts.length) out += '<p class="hpa-muted">حسابی ثبت نشده است.</p>';
@@ -1907,8 +2047,8 @@ function view_reports() {
   out += report_places_largest_balance();
   out += report_networth_affecting();
   out += report_cashflow_and_calendar();
-  out += '<section class="hpa-card"><div class="hpa-section-head"><div><h2>خروجی PDF و بکاپ</h2><p class="hpa-muted">برای PDF از چاپ استفاده کن و مقصد را Save as PDF بگذار. بکاپ JSON شامل همه داده‌ها است.</p></div><button type="button" class="hpa-btn hpa-btn-primary" onclick="window.print()">خروجی PDF گزارش</button></div>';
-  out += '<div class="hpa-row-actions hpa-backup-actions"><a class="hpa-btn hpa-btn-ghost" href="' + U.esc_url(actionUrl('hpa_export_backup')) + '">دانلود بکاپ کامل</a>';
+  out += '<section class="hpa-card hpa-export-card"><div class="hpa-section-head"><div><h2>خروجی و اشتراک‌گذاری گزارش</h2><p class="hpa-muted">گزارش را PDF یا Excel بگیر، یا بکاپ کامل تهیه کن.</p></div></div><div class="hpa-export-grid"><button type="button" class="hpa-export-btn hpa-export-pdf" onclick="window.print()"><span>📄</span>خروجی PDF</button><a class="hpa-export-btn hpa-export-xls" href="' + U.esc_url(actionUrl('hpa_export_csv')) + '"><span>📊</span>خروجی Excel</a><a class="hpa-export-btn hpa-export-backup" href="' + U.esc_url(actionUrl('hpa_export_backup')) + '"><span>💾</span>بکاپ JSON</a></div>';
+  out += '<div class="hpa-row-actions hpa-backup-actions">';
   out += form_open('hpa_import_backup', true);
   out += '<input type="file" name="hpa_backup" accept="application/json" required><button class="hpa-btn hpa-btn-primary" type="submit">بازیابی بکاپ</button></form></div></section>';
   out += '<section class="hpa-card"><h2>آخرین تراکنش‌ها برای کنترل گزارش</h2>' + transactions_table(12) + '</section>';
@@ -2149,6 +2289,7 @@ function renderTab(tab) {
   else if (tab === 'categories') body = view_categories();
   else if (tab === 'transactions') body = view_transactions();
   else if (tab === 'debt') body = view_debts_full();
+  else if (tab === 'budget') body = view_budget();
   else if (tab === 'receivable') body = view_debt_like('receivables', 'receivable', 'طلب‌ها', 'hpa_save_receivable', 'بدهکار');
   else if (tab === 'assets') body = view_assets();
   else if (tab === 'reports') body = view_reports();
@@ -2163,6 +2304,7 @@ function renderTab(tab) {
 const ACTIONS = {
   hpa_save_account: (p, f) => save_account(p), hpa_delete_account: (p) => delete_account(p), hpa_reopen_account: (p) => reopen_account(p),
   hpa_save_category: (p) => save_category(p), hpa_delete_category: (p) => delete_category(p),
+  hpa_save_budgets: (p) => save_budgets(p),
   hpa_save_transaction: (p, f) => save_transaction(p, f), hpa_delete_transaction: (p) => delete_transaction(p),
   hpa_save_debt: (p, f) => save_debt_like(p, f, 'debts', 'debt'), hpa_save_receivable: (p, f) => save_debt_like(p, f, 'receivables', 'receivable'),
   hpa_delete_debt: (p) => delete_debt(p), hpa_delete_receivable: (p) => delete_receivable(p),
@@ -2207,7 +2349,7 @@ function import_backup(data) {
 Object.assign(module.exports, {
   renderTab, handleAction, setUploadDir, export_backup_json, import_backup,
   future_obligation_items, resolve_recurring_payment_selection, get_goals,
-  render_archive_report
+  render_archive_report, export_transactions_csv
 });
 
 

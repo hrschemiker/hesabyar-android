@@ -50,6 +50,7 @@ var SYNC_ACTIONS = { hpa_save_sync: 'saveAndLogin', hpa_sync_test: 'test', hpa_s
 function dispatchAction(action, post) {
   CORE.setContext(post, TOKEN);
   if (action === 'hpa_export_backup') { downloadText('hesabyar-backup-' + U.today_gregorian().replace(/-/g, '') + '.json', JSON.stringify(CORE.export_backup_json(), null, 2), 'application/json'); return Promise.resolve(null); }
+  if (action === 'hpa_export_csv') { downloadText('hesabyar-transactions-' + U.today_gregorian().replace(/-/g, '') + '.csv', CORE.export_transactions_csv(), 'text/csv;charset=utf-8'); return Promise.resolve(null); }
   if (action === 'hpa_archive_pdf' || action === 'hpa_archive_report') { exportPdf('archive-' + (post.id || ''), CORE.render_archive_report(post.id)); return Promise.resolve(null); }
   if (action === 'hpa_fetch_rates') { return SYNC.full(true).then(function () { DB.save(); goTab('rates', { hpa_msg: 'saved' }); }); }
   if (SYNC_ACTIONS[action]) {

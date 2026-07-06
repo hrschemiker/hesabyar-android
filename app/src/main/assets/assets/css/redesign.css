@@ -110,3 +110,156 @@
   .hpa-transaction-form-card .hpa-btn-primary, .hpa-account-form-details .hpa-btn-primary { width: 100%; justify-content: center;
     min-height: 50px; border-radius: 16px !important; font-size: 15px !important; font-weight: 900 !important; }
 }
+
+/* ---- Accounts screen ---- */
+@media (max-width: 860px) {
+  .hpa-acc-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 4px 0 12px; }
+  .hpa-acc-count { border-radius: 22px; overflow: hidden; position: relative; min-height: 128px; background-color: #6f51e6;
+    background-size: cover; background-position: center; box-shadow: 0 14px 30px rgba(108,76,224,.28); }
+  .hpa-acc-count::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(111,81,230,.12), rgba(111,81,230,.6)); }
+  .hpa-acc-count-in { position: relative; z-index: 2; padding: 15px; display: flex; flex-direction: column; height: 100%;
+    min-height: 128px; justify-content: center; color: #fff; text-align: right; box-sizing: border-box; }
+  .hpa-acc-count-in small { font-size: 12px; opacity: .92; font-weight: 700; }
+  .hpa-acc-count-in b { font-size: 36px; font-weight: 900; line-height: 1.1; }
+  .hpa-acc-count-in span { font-size: 12px; opacity: .85; font-weight: 700; }
+  .hpa-acc-total { background: var(--hy-card); border-radius: 22px; padding: 16px; display: flex; flex-direction: column;
+    justify-content: center; box-shadow: 0 12px 30px rgba(20,25,60,.05); position: relative; }
+  .hpa-acc-total-ic { position: absolute; top: 14px; left: 14px; width: 38px; height: 38px; border-radius: 12px; background: #f3efff;
+    display: grid; place-items: center; font-size: 18px; }
+  .hpa-acc-total small { color: var(--hy-mut); font-size: 12px; font-weight: 800; }
+  .hpa-acc-total b { color: var(--hy-pri); font-size: 18px; font-weight: 900; margin-top: 8px; }
+  .hpa-acc-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .hpa-acc-action { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--hy-card);
+    border-radius: 16px; padding: 14px 8px; font-weight: 800; font-size: 12.5px; color: var(--hy-ink) !important;
+    text-decoration: none !important; box-shadow: 0 10px 24px rgba(20,25,60,.05); }
+  .hpa-acc-action span { font-size: 16px; }
+  .hpa-acc-action-add { background: linear-gradient(135deg,#8b6cf2,#6c4ce0); color: #fff !important; }
+  .hpa-account-form-details > summary { list-style: none; font-weight: 900; color: var(--hy-pri); }
+  .hpa-account-form-details > summary::-webkit-details-marker { display: none; }
+  .hpa-account-card-grid { display: grid !important; grid-template-columns: 1fr !important; gap: 10px !important; }
+  .hpa-account-card { border-radius: 18px !important; overflow: hidden; box-shadow: 0 8px 20px rgba(20,25,60,.05); background: var(--hy-card); border: 1px solid #f0f2f8; }
+  .hpa-account-card > summary { display: grid !important; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+    padding: 12px 14px !important; list-style: none; background: var(--hy-card) !important; border: 0 !important; }
+  .hpa-account-card > summary::-webkit-details-marker { display: none; }
+  .hpa-account-card-icon { width: 46px; height: 46px; border-radius: 14px; background: #f4f6fc; display: grid !important;
+    place-items: center; font-size: 20px; overflow: hidden; }
+  .hpa-account-card-icon .hpa-bank-logo { width: 34px; height: 34px; }
+  .hpa-account-card-info strong { font-size: 15px; color: var(--hy-ink); display: block; }
+  .hpa-account-card-info small { font-size: 11.5px; color: var(--hy-mut); font-weight: 700; }
+  .hpa-account-card-balance { font-size: 15px; font-weight: 900; color: var(--hy-ink); white-space: nowrap; }
+}
+
+/* ---- Debts screen ---- */
+@media (max-width: 860px) {
+  .hpa-debt-hero { position: relative; border-radius: 26px; overflow: hidden; margin: 4px 0 14px; min-height: 176px;
+    background-color: #6f51e6; background-size: auto 118%; background-position: -10px center; background-repeat: no-repeat;
+    box-shadow: 0 20px 40px rgba(108,76,224,.30); }
+  .hpa-debt-hero::before { content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(270deg, #6f51e6 0%, #6f51e6 42%, rgba(111,81,230,.5) 66%, rgba(111,81,230,0) 90%); }
+  .hpa-debt-hero-in { position: relative; z-index: 2; padding: 18px 20px; min-height: 176px; display: flex; flex-direction: column;
+    align-items: flex-end; text-align: right; box-sizing: border-box; }
+  .hpa-debt-hero-top { margin-left: auto; max-width: 66%; }
+  .hpa-debt-hero-top small { color: rgba(255,255,255,.85); font-size: 13px; font-weight: 700; }
+  .hpa-debt-hero-top b { display: block; color: #fff; font-size: clamp(20px,7vw,27px); font-weight: 900; white-space: nowrap;
+    text-shadow: 0 2px 14px rgba(30,10,80,.28); margin-top: 4px; }
+  .hpa-debt-hero-due { margin-top: auto; width: 100%; border-top: 1px solid rgba(255,255,255,.22); padding-top: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .hpa-debt-hero-due-info small { color: rgba(255,255,255,.8); font-size: 11.5px; font-weight: 700; display: block; }
+  .hpa-debt-hero-due-info b { color: #fff; font-size: 13px; font-weight: 800; }
+  .hpa-debt-hero-days { color: #ffd76a; font-size: 13px; font-weight: 900; white-space: nowrap; }
+  .hpa-debt-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+  .hpa-debt-stat { background: var(--hy-card); border-radius: 18px; padding: 14px 12px; display: flex; flex-direction: column;
+    gap: 8px; box-shadow: 0 10px 24px rgba(20,25,60,.05); position: relative; text-align: right; }
+  .hpa-debt-stat small { color: var(--hy-mut); font-size: 11px; font-weight: 800; display: block; }
+  .hpa-debt-stat b { font-size: 14px; font-weight: 900; color: var(--hy-ink); white-space: nowrap; }
+  .hpa-debt-stat-ic { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-size: 15px; }
+  .hpa-debt-stat-overdue b { color: var(--hy-red); } .hpa-debt-stat-overdue .hpa-debt-stat-ic { background: #fff1f4; }
+  .hpa-debt-stat-paid b { color: var(--hy-amber); } .hpa-debt-stat-paid .hpa-debt-stat-ic { background: #fff7ea; }
+  .hpa-debt-stat-month b { color: var(--hy-green); } .hpa-debt-stat-month .hpa-debt-stat-ic { background: #e9fbf1; }
+  /* hide the redundant empty "بدهی‌های ساده" placeholder card */
+  .hpa-debt-tabs { display: none; }
+}
+
+/* ---- Budget screen ---- */
+@media (max-width: 860px) {
+  .hpa-budget-hero { position: relative; border-radius: 24px; overflow: hidden; margin: 4px 0 14px; min-height: 150px;
+    background: #fff; background-size: auto 130%; background-position: -30px center; background-repeat: no-repeat;
+    box-shadow: 0 14px 32px rgba(20,25,60,.07); border: 1px solid #eef1f7; }
+  .hpa-budget-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(270deg,#fff 0%,#fff 46%,rgba(255,255,255,.7) 66%,rgba(255,255,255,0) 88%); }
+  .hpa-budget-hero-in { position: relative; z-index: 2; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+    align-items: flex-end; text-align: right; }
+  .hpa-budget-hero-head { max-width: 66%; margin-left: auto; }
+  .hpa-budget-hero-head small { color: var(--hy-mut); font-size: 13px; font-weight: 800; }
+  .hpa-budget-hero-head b { display: block; color: var(--hy-ink); font-size: clamp(19px,6.5vw,25px); font-weight: 900; white-space: nowrap; }
+  .hpa-budget-bar { width: 100%; height: 12px; border-radius: 999px; background: #eceafc; position: relative; overflow: hidden; }
+  .hpa-budget-bar span { position: absolute; top: 0; bottom: 0; right: 0; left: auto; border-radius: 999px;
+    background: linear-gradient(90deg,#8b6cf2,#6c4ce0); }
+  .hpa-budget-bar em { position: absolute; left: 8px; top: -1px; font-size: 10px; font-weight: 900; color: #fff; font-style: normal; }
+  .hpa-budget-hero-foot { width: 100%; display: flex; justify-content: space-between; }
+  .hpa-budget-hero-foot small { color: var(--hy-mut); font-size: 11.5px; font-weight: 800; display: block; }
+  .hpa-budget-hero-foot b { font-size: 15px; font-weight: 900; color: var(--hy-ink); }
+  .hpa-budget-hero-foot .hpa-pos { color: var(--hy-pri); } .hpa-budget-hero-foot .hpa-neg { color: var(--hy-red); }
+  .hpa-budget-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .hpa-budget-sum { background: var(--hy-card); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 4px;
+    text-decoration: none !important; box-shadow: 0 12px 30px rgba(20,25,60,.05); position: relative; }
+  .hpa-budget-sum-ic { position: absolute; top: 14px; left: 14px; width: 36px; height: 36px; border-radius: 12px; display: grid;
+    place-items: center; font-size: 17px; }
+  .hpa-budget-sum-asset .hpa-budget-sum-ic { background: #e9fbf1; } .hpa-budget-sum-recv .hpa-budget-sum-ic { background: #f3efff; }
+  .hpa-budget-sum small { color: var(--hy-mut); font-size: 12px; font-weight: 800; }
+  .hpa-budget-sum b { color: var(--hy-ink); font-size: 16px; font-weight: 900; }
+  .hpa-budget-sum-asset b { color: var(--hy-green); } .hpa-budget-sum-recv b { color: var(--hy-pri); }
+  .hpa-budget-rings { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px 6px; }
+  .hpa-bring { display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; }
+  .hpa-bring-svg { width: 66px; height: 66px; transform: rotate(-90deg); }
+  .hpa-bring-bg { fill: none; stroke: #eef1f7; stroke-width: 7; }
+  .hpa-bring-fg { fill: none; stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset .5s; }
+  .hpa-bring-pct { position: absolute; top: 24px; left: 0; right: 0; text-align: center; font-size: 13px; font-weight: 900; color: var(--hy-ink); }
+  .hpa-bring b { font-size: 11px; font-weight: 800; color: var(--hy-ink); text-align: center; line-height: 1.3; }
+  .hpa-bring small { font-size: 10px; color: var(--hy-mut); font-weight: 700; }
+  .hpa-budget-set > summary { list-style: none; font-weight: 900; color: var(--hy-pri); }
+  .hpa-budget-set > summary::-webkit-details-marker { display: none; }
+  .hpa-budget-two-lists { display: grid; grid-template-columns: 1fr; gap: 0; }
+}
+
+/* ---- Reports: export card + cashflow chart ---- */
+@media (max-width: 860px) {
+  .hpa-export-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 4px; }
+  .hpa-export-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 6px; border-radius: 16px;
+    font-weight: 800; font-size: 12px; text-decoration: none !important; border: 0; cursor: pointer; box-shadow: 0 8px 20px rgba(20,25,60,.05);
+    font-family: inherit !important; }
+  .hpa-export-btn span { font-size: 20px; }
+  .hpa-export-pdf { background: #fff1f4; color: #e11d48 !important; }
+  .hpa-export-xls { background: #e9fbf1; color: #059669 !important; }
+  .hpa-export-backup { background: #eef2ff; color: #4f46e5 !important; }
+  .hpa-cashflow-card .hpa-svg-expense { fill: #f5476b; }
+  .hpa-cashflow-card .hpa-svg-income { fill: #16c784; }
+  .hpa-svg-axis { stroke: #e6e9f2; }
+}
+
+/* ---- Transactions screen ---- */
+@media (max-width: 860px) {
+  .hpa-tx-ftabs { display: flex; gap: 6px; background: var(--hy-card); border-radius: 16px; padding: 5px; margin: 4px 0 12px;
+    box-shadow: 0 8px 20px rgba(20,25,60,.05); }
+  .hpa-tx-ftab { flex: 1; text-align: center; padding: 9px 4px; border-radius: 12px; font-size: 12.5px; font-weight: 800;
+    color: var(--hy-mut) !important; text-decoration: none !important; }
+  .hpa-tx-ftab.is-active { background: linear-gradient(135deg,#8b6cf2,#6c4ce0); color: #fff !important; box-shadow: 0 8px 18px rgba(108,76,224,.32); }
+  .hpa-tx-today { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--hy-card); border-radius: 18px;
+    overflow: hidden; margin-bottom: 12px; box-shadow: 0 10px 24px rgba(20,25,60,.05); }
+  .hpa-tx-today-item { padding: 14px 8px; text-align: center; background: var(--hy-card); }
+  .hpa-tx-today-item small { display: block; color: var(--hy-mut); font-size: 11.5px; font-weight: 800; margin-bottom: 4px; }
+  .hpa-tx-today-item b { font-size: 14px; font-weight: 900; white-space: nowrap; }
+  .hpa-tx-in b { color: var(--hy-green); } .hpa-tx-out b { color: var(--hy-red); } .hpa-tx-net b { color: var(--hy-pri); }
+  .hpa-tx-banner { display: block; position: relative; border-radius: 22px; overflow: hidden; min-height: 92px; margin-bottom: 14px;
+    background-color: #6f51e6; background-size: cover; background-position: center; text-decoration: none !important;
+    box-shadow: 0 16px 32px rgba(108,76,224,.28); }
+  .hpa-tx-banner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(270deg,#6f51e6 0%,rgba(111,81,230,.65) 55%,rgba(111,81,230,0) 100%); }
+  .hpa-tx-banner-in { position: relative; z-index: 2; padding: 20px; text-align: right; }
+  .hpa-tx-banner-in b { display: block; color: #fff; font-size: 17px; font-weight: 900; }
+  .hpa-tx-banner-in small { color: rgba(255,255,255,.85); font-size: 12.5px; font-weight: 700; }
+  #hpa-tx-form { scroll-margin-top: 10px; }
+}
+
+
+
+
+

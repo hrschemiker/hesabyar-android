@@ -1,0 +1,59 @@
+/* HesabYar Android — extras layered on top of the responsive‑site look (hpa.css):
+   bank logos, account‑icon picker, a crafted inline transaction form (replacing the
+   step‑by‑step wizard), number emphasis, and the reports export card + cash‑flow chart.
+   Loaded after hpa.css + app.css so it wins. */
+
+/* ---- number emphasis: keep the millions digits full‑size, shrink the rest + the currency word ---- */
+.hy-rest { font-size: .60em; font-weight: 800; opacity: .92; }
+.hy-cur  { font-size: .52em; font-weight: 700; opacity: .72; margin-right: .28em; }
+.hpa-hero-amount .hy-cur { opacity: .85; }
+
+/* ---- bank logos (transparent PNGs — no white box) ---- */
+.hpa-bank-logo { width: 28px; height: 28px; object-fit: contain; display: inline-block; vertical-align: middle; }
+.hpa-bank-logo-sm { width: 20px; height: 20px; }
+.hpa-badge .hpa-bank-logo, .hpa-account-card-icon .hpa-bank-logo { width: 30px; height: 30px; }
+
+/* ---- account‑icon / bank‑logo picker ---- */
+.hpa-icon-picker-glyphs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.hpa-icon-picker-banks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-height: 250px; overflow: auto;
+  padding-top: 10px; border-top: 1px dashed var(--line, #e7ebf3); }
+.hpa-icon-opt { border: 1.5px solid var(--line, #e7ebf3); background: #fff; border-radius: 14px; cursor: pointer; padding: 8px 5px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px; font-family: inherit; }
+.hpa-icon-opt-glyph { width: 44px; height: 44px; justify-content: center; font-size: 20px; border-radius: 50%; }
+.hpa-icon-opt-bank img { width: 30px; height: 30px; object-fit: contain; }
+.hpa-icon-opt-bank small { font-size: 9px; color: var(--muted, #667085); font-weight: 800; line-height: 1.25; text-align: center; }
+.hpa-icon-opt.is-selected { border-color: var(--pri, #4f46e5); background: #f3f0ff; box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+
+/* ---- retire the step wizard, show the crafted inline form on mobile ---- */
+@media (max-width: 780px) {
+  .hpa-transaction-form-card.hpa-creating .hpa-form { display: grid !important; }
+  .hpa-transaction-form-card.hpa-creating:after { content: '' !important; display: none !important; }
+  .hpa-transaction-form-card > h2 { display: block !important; }
+  .hpa-mobile-wizard-launch, .hpa-mobile-asset-wizard-launch,
+  .hpa-transaction-wizard, .hpa-asset-wizard { display: none !important; }
+  .hpa-asset-form-card.hpa-creating .hpa-form { display: grid !important; }
+}
+/* polish the transaction form into a clean, crafted UI consistent with the app */
+.hpa-transaction-form-card { border-radius: 24px; }
+.hpa-transaction-form-card .hpa-form-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+.hpa-transaction-form-card .hpa-form label { font-size: 12.5px; font-weight: 800; color: var(--muted, #667085); gap: 7px; }
+.hpa-transaction-form-card .hpa-form input, .hpa-transaction-form-card .hpa-form select,
+.hpa-transaction-form-card .hpa-form textarea { border-radius: 14px; padding: 12px 12px; font-size: 14px;
+  border: 1.5px solid var(--line, #e7ebf3); background: var(--panel2, #fbfcff); }
+.hpa-transaction-form-card .hpa-form input:focus, .hpa-transaction-form-card .hpa-form select:focus,
+.hpa-transaction-form-card .hpa-form textarea:focus { border-color: var(--pri, #4f46e5); box-shadow: 0 0 0 4px rgba(79,70,229,.10); }
+.hpa-transaction-form-card .hpa-col-full { grid-column: 1 / -1; }
+.hpa-transaction-form-card button[type=submit], .hpa-transaction-form-card .hpa-btn-primary {
+  width: 100%; justify-content: center; min-height: 50px; border-radius: 16px; font-size: 15px; font-weight: 900; margin-top: 4px; }
+.hpa-icon-picker-field { grid-column: 1 / -1; }
+
+/* ---- reports: export card + cash‑flow chart ---- */
+.hpa-export-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+.hpa-export-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 6px; border-radius: 16px;
+  font-weight: 800; font-size: 12px; text-decoration: none !important; border: 0; cursor: pointer; font-family: inherit; }
+.hpa-export-btn span { font-size: 20px; }
+.hpa-export-pdf { background: #fff1f4; color: #e11d48 !important; }
+.hpa-export-xls { background: #e9fbf1; color: #059669 !important; }
+.hpa-export-backup { background: #eef2ff; color: #4f46e5 !important; }
+.hpa-cf-in { fill: #16c784; } .hpa-cf-out { fill: #f43f5e; }
+.hpa-cashflow-svg .hpa-svg-axis { stroke: #e6e9f2; }

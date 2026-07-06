@@ -119,7 +119,7 @@
     form.querySelectorAll('.hpa-check-settlement-field').forEach(function(el){el.style.display=(t==='check_settlement')?'grid':'none';});
     form.querySelectorAll('.hpa-asset-link-field').forEach(function(el){el.style.display=(t==='asset_buy'||t==='asset_sell')?'grid':'none';});
     form.querySelectorAll('.hpa-recurring-debt-field').forEach(function(el){el.style.display=(t==='recurring_debt')?'grid':'none';});
-    // اقلام خرید فقط برای تراکنش‌هایی که واقعاً «خرید» هستند؛ تسویه بدهی/چک/انتقال/خرید دارایی نباید لیست اقلام بخواهند.
+    // اقلام خرید فقط برای هزینه/درآمد؛ تسویه‌ها و انتقال‌ها لیست اقلام نمی‌خواهند.
     var hasItems=['expense','recurring_debt','income'].indexOf(t)>-1;
     form.querySelectorAll('.hpa-items-field').forEach(function(el){el.style.display=hasItems?'grid':'none';});
     var cat=form.querySelector('select[name="category_id"].hpa-category-by-type');
@@ -248,10 +248,7 @@
     return wrap;
   }
   function initWizard(){
-    // v1.2 — the step-by-step wizard overlay is retired in favour of the clean
-    // inline conditional form (which correctly shows the debt/receivable/cheque
-    // selector per type and hides purchase-items for settlements). Kept the code
-    // for reference but no longer initialised.
+    // Step-by-step wizard retired: the styled inline form is the single entry path.
     if(true) return;
     var form=findForm(); if(!form || form.dataset.wizardReady) return; form.dataset.wizardReady='1';
     var launch=document.createElement('button'); launch.type='button'; launch.className='hpa-btn hpa-btn-primary hpa-mobile-wizard-launch'; launch.id='hpa-mobile-wizard-launch'; launch.textContent='ثبت تراکنش';
@@ -886,7 +883,7 @@
 })();
 
 
-/* v1.2 — account icon / bank-logo picker */
+/* account icon / bank-logo picker */
 (function(){
   document.addEventListener('click', function(e){
     var opt = e.target.closest ? e.target.closest('.hpa-icon-opt') : null;

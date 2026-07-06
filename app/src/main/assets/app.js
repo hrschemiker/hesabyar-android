@@ -57,12 +57,10 @@ function dispatchAction(action, post) {
     var fn = SYNC_ACTIONS[action];
     return Promise.resolve(SYNC[fn](post)).then(function () {
       DB.save();
-      // The moment the app connects to the site, run a full two-way sync immediately.
+      // As soon as the app connects to the site, run a full two-way sync immediately.
       if (fn === 'saveAndLogin') {
         var s = SYNC.getSync();
-        if (s.enabled && s.token) {
-          return SYNC.full(true).then(function () { DB.save(); try { localStorage.removeItem('hpa_dirty'); } catch (e) {} goTab('settings', { hpa_msg: 'saved' }); });
-        }
+        if (s.enabled && s.token) { return SYNC.full(true).then(function () { DB.save(); try { localStorage.removeItem('hpa_dirty'); } catch (e) {} goTab('settings', { hpa_msg: 'saved' }); }); }
       }
       goTab('settings', { hpa_msg: 'saved' });
     });

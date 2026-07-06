@@ -41,19 +41,16 @@ Everything the web/desktop app has, in your pocket:
 - 💱 **Rates** (TGJU) · 🗄️ **Archive** a period (+ PDF) · ♻️ recycle bin · 🔒 PIN lock.
 - Jalali calendar & Persian numerals throughout, same **IRANSansX** + **Gramophone** fonts.
 
-## 🆕 New in 1.3.0
+## 🆕 New in 1.4.0
 
-- **🎨 Full mockup-matched redesign — every screen.** Bespoke purple hero cards on **accounts** (count + total), **debts** (total + nearest due + overdue/paid/this‑month status cards), and a brand‑new **budget** overview — all consistent with the dashboard.
-- **🎯 Budget screen with category rings.** Set a monthly limit per category and watch animated progress rings show spend‑vs‑limit, alongside total assets, total receivables, and asset/receivable breakdowns.
-- **📊 New charts + Excel export.** A monthly **cash‑flow** chart (in vs out) in Reports, plus one‑tap **Excel (CSV)** export of all transactions (UTF‑8, opens cleanly in Excel) next to PDF and JSON backup.
-- **🧾 Smarter transactions screen.** Type filter tabs (all / income / expense / transfer), a live **today** summary (income · expense · net), and a quick add‑transaction banner above the clean inline form.
+The app keeps the clean look of the mobile website, with a focused set of upgrades:
 
-## 🆕 New in 1.2.0
-
-- **🎨 Redesigned mobile UI.** A refreshed, cohesive look across the app: a purple **موجودی کل** balance hero with a 3D wallet, four colour-coded quick actions (expense · income · transfer · new invoice), softer cards with consistent spacing, and a floating‑action bottom bar with a raised centre **＋**.
-- **🏦 Bank logos for accounts.** When adding an account you can now pick your **bank's real logo** (Melli, Mellat, Tejarat, Saderat, Sepah, Pasargad, Parsian, and 25+ more) instead of an emoji — and the logo shows throughout the account lists and ledger.
-- **🧾 Correct transaction form.** The step‑wizard is retired in favour of a clean inline form that shows exactly the right fields per type: choosing **تسویه بدهی/چک/طلب** now shows the *which‑obligation* selector (as on the desktop/site), and purchase **items** no longer appear on settlements/transfers.
-- **🔁 Instant sync on connect.** The moment you connect the app to your site, a full two‑way sync runs immediately — and on every launch thereafter.
+- **🏦 Bank logos (transparent).** Pick your bank's real logo — ملی، ملت، تجارت، صادرات، سپه، پاسارگاد، پارسیان and 25+ more — instead of an emoji. Logos are **interlaced PNGs with transparent backgrounds** (no white box) and show across account lists, the ledger and reports.
+- **🧾 Crafted transaction form.** The step‑by‑step questionnaire is replaced by a single, well‑styled form. It shows exactly the right fields per type — choosing **تسویه بدهی/چک/طلب** reveals the *which‑obligation* selector, and purchase **items** never appear on settlements or transfers. No clutter of helper captions under the fields.
+- **📊 New chart in Reports.** A monthly **cash‑flow** chart (money in vs out), plus one‑tap **Excel (CSV)** export of all transactions (UTF‑8, opens cleanly in Excel) beside PDF and JSON backup.
+- **🔢 Readable big numbers.** For large Toman/Rial amounts, the **millions digits stay full‑size** while the rest of the number — and the «تومان» / «ریال» label — render smaller, so totals are instantly scannable.
+- **🔁 Automatic sync.** Two‑way sync runs **the moment the app opens**, **the moment you record or change anything**, and immediately when you first connect to your site — all in the background.
+- **⚙️ Settings hub.** Accounts, categories, debts/loans/cheques, receivables and rates live in **Settings**, keeping the bottom bar clean.
 
 ## 🆕 New in 1.1.0
 

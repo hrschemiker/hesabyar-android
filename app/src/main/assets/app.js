@@ -53,7 +53,18 @@ function dispatchAction(action, post) {
   if (action === 'hpa_archive_pdf' || action === 'hpa_archive_report') { exportPdf('archive-' + (post.id || ''), CORE.render_archive_report(post.id)); return Promise.resolve(null); }
   if (action === 'hpa_fetch_rates') { return SYNC.full(true).then(function () { DB.save(); goTab('rates', { hpa_msg: 'saved' }); }); }
   if (SYNC_ACTIONS[action]) {
-    return Promise.resolve(SYNC[SYNC_ACTIONS[action]](post)).then(function () { DB.save(); goTab('settings', { hpa_msg: 'saved' }); });
+    var fn = SYNC_ACTIONS[action];
+    return Promise.resolve(SYNC[fn](post)).then(function () {
+      DB.save();
+      // The moment the app connects to the site, run a full two-way sync immediately.
+      if (fn === 'saveAndLogin') {
+        var s = SYNC.getSync();
+        if (s.enabled && s.token) {
+          return SYNC.full(true).then(function () { DB.save(); try { localStorage.removeItem('hpa_dirty'); } catch (e) {} goTab('settings', { hpa_msg: 'saved' }); });
+        }
+      }
+      goTab('settings', { hpa_msg: 'saved' });
+    });
   }
   var tab = CORE.handleAction(action, post, {}); // files not uploaded from phone in v1
   DB.save();

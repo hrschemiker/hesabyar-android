@@ -1,0 +1,112 @@
+/* =====================================================================
+   HesabYar Android v1.2 — mobile visual redesign (matches the 2026 mockups)
+   Loaded after hpa.css + app.css so it wins. Scoped to the phone viewport
+   so the desktop app is untouched.
+   ===================================================================== */
+@media (max-width: 860px) {
+  :root { --hy-bg:#f3f5fb; --hy-card:#ffffff; --hy-ink:#1d2340; --hy-mut:#8b90a6; --hy-line:#eef1f7;
+    --hy-pri:#6c4ce0; --hy-pri2:#8b6cf2; --hy-green:#16c784; --hy-red:#f5476b; --hy-blue:#3b82f6; --hy-amber:#f59e0b; }
+  html, body { background: var(--hy-bg) !important; }
+  .hpa-app { background: transparent !important; }
+  .hpa-main { padding-top: 4px !important; }
+
+  /* ---- top greeting bar ---- */
+  .hpa-top { position: static !important; background: transparent !important; border: 0 !important;
+    box-shadow: none !important; backdrop-filter: none !important; padding: 6px 2px 10px !important; }
+  .hpa-brand-text strong { font-size: 20px !important; }
+  .hpa-brand-text span { color: var(--hy-mut) !important; }
+
+  /* ---- balance hero (موجودی کل) ---- */
+  .hpa-balance-hero { position: relative; border-radius: 26px; overflow: hidden; margin: 4px 0 16px;
+    min-height: 170px; background-color: #6f51e6; background-size: auto 118%; background-position: -14px center;
+    background-repeat: no-repeat; box-shadow: 0 20px 40px rgba(108,76,224,.30); }
+  /* purple wash: opaque on the right (where the text is), clear on the left (wallet). also hides the baked eye/pill */
+  .hpa-balance-hero::before { content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(270deg, #6f51e6 0%, #6f51e6 44%, rgba(111,81,230,.55) 66%, rgba(111,81,230,0) 88%); }
+  .hpa-balance-hero-in { position: relative; z-index: 2; padding: 18px 20px 16px; display: flex;
+    flex-direction: column; align-items: flex-end; text-align: right; min-height: 170px; box-sizing: border-box; max-width: 66%; margin-left: auto; }
+  .hpa-balance-label { color: rgba(255,255,255,.86); font-size: 13.5px; font-weight: 700; margin-top: 2px; }
+  .hpa-balance-amount { color: #fff; font-size: clamp(20px, 7vw, 28px); font-weight: 900; letter-spacing: .2px; margin: 6px 0 2px;
+    white-space: nowrap; text-shadow: 0 2px 14px rgba(30,10,80,.28); }
+  .hpa-balance-sub { color: rgba(255,255,255,.82); font-size: 12.5px; font-weight: 700; }
+  .hpa-balance-pill { margin-top: auto; align-self: flex-end; background: rgba(255,255,255,.20);
+    border: 1px solid rgba(255,255,255,.30); color: #fff !important; text-decoration: none !important;
+    border-radius: 999px; padding: 8px 15px; font-size: 12.5px; font-weight: 800; backdrop-filter: blur(6px); }
+
+  /* ---- quick actions ---- */
+  .hpa-quick-actions { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; background: var(--hy-card);
+    border-radius: 22px; padding: 16px 8px; margin: 0 0 16px; box-shadow: 0 12px 30px rgba(20,25,60,.05); }
+  .hpa-qa { display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none !important; }
+  .hpa-qa-ic { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font-size: 22px;
+    color: #fff; box-shadow: 0 10px 20px rgba(20,25,60,.14); }
+  .hpa-qa small { color: var(--hy-ink); font-size: 11.5px; font-weight: 800; }
+  .hpa-qa-expense .hpa-qa-ic { background: linear-gradient(135deg,#fb5f86,#f5476b); }
+  .hpa-qa-income  .hpa-qa-ic { background: linear-gradient(135deg,#2ee0a0,#16c784); }
+  .hpa-qa-transfer .hpa-qa-ic { background: linear-gradient(135deg,#4f9bff,#3b82f6); }
+  .hpa-qa-new     .hpa-qa-ic { background: linear-gradient(135deg,#8b6cf2,#6c4ce0); }
+
+  /* ---- market rate pills ---- */
+  .hpa-rate-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 16px; }
+  .hpa-rate-pill { background: var(--hy-card); border-radius: 18px; padding: 12px 14px; display: flex;
+    align-items: center; justify-content: space-between; box-shadow: 0 10px 24px rgba(20,25,60,.05); }
+  .hpa-rate-pill small { color: var(--hy-mut); font-weight: 800; font-size: 12px; }
+  .hpa-rate-pill b { color: var(--hy-ink); font-weight: 900; font-size: 13.5px; }
+
+  /* ---- cards & spacing consistency ---- */
+  .hpa-card { border-radius: 22px !important; border: 0 !important; box-shadow: 0 12px 30px rgba(20,25,60,.05) !important;
+    margin: 0 0 16px !important; padding: 18px 16px !important; background: var(--hy-card) !important; }
+  .hpa-card h2, .hpa-card h3 { font-size: 16px !important; color: var(--hy-ink) !important; }
+  .hpa-three, .hpa-two, .hpa-dashboard-middle { display: grid !important; grid-template-columns: 1fr !important; gap: 0 !important; }
+  .hpa-kpis { grid-template-columns: 1fr 1fr !important; gap: 12px !important; margin-bottom: 4px !important; }
+  .hpa-kpi { border-radius: 20px !important; border: 0 !important; background: var(--hy-card) !important;
+    box-shadow: 0 10px 24px rgba(20,25,60,.05) !important; padding: 15px !important; }
+
+  /* ---- bottom nav: white bar + centre FAB ---- */
+  .hpa-mobile-nav { display: flex !important; align-items: center; justify-content: space-around;
+    right: 10px !important; left: 10px !important; background: rgba(255,255,255,.96) !important; backdrop-filter: blur(16px);
+    border: 1px solid #eef1f7 !important; border-radius: 26px !important; padding: 8px 6px !important; overflow: visible !important;
+    box-shadow: 0 -6px 30px rgba(20,25,60,.10) !important; }
+  .hpa-mobile-nav .hpa-nav-item { flex: 1; display: flex !important; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--hy-mut) !important; background: transparent !important; border: 0 !important; text-decoration: none !important;
+    font-size: 11px; font-weight: 800; padding: 4px 0 !important; }
+  .hpa-mobile-nav .hpa-nav-item .hpa-nav-ico { background: transparent !important; font-size: 19px; width: auto; height: auto; }
+  .hpa-mobile-nav .hpa-nav-item.is-active { color: var(--hy-pri) !important; }
+  .hpa-nav-fab { flex: 0 0 auto; width: 58px; height: 58px; margin-top: -26px; border-radius: 50%;
+    background: linear-gradient(135deg,#8b6cf2,#6c4ce0); color: #fff !important; display: grid !important; place-items: center;
+    text-decoration: none !important; box-shadow: 0 14px 26px rgba(108,76,224,.42); border: 4px solid var(--hy-bg); }
+  .hpa-nav-fab span { font-size: 30px; font-weight: 400; line-height: 1; margin-top: -2px; }
+
+  /* ---- account list + bank logos ---- */
+  .hpa-bank-logo { width: 30px; height: 30px; object-fit: contain; display: inline-block; vertical-align: middle; border-radius: 8px; background: #fff; }
+  .hpa-bank-logo-sm { width: 22px; height: 22px; }
+  .hpa-badge .hpa-bank-logo { width: 34px; height: 34px; }
+  .hpa-acc-emoji { font-size: 20px; }
+  .hpa-account-list-row { border-radius: 18px !important; background: var(--hy-card) !important; margin-bottom: 10px !important;
+    border: 1px solid #f0f2f8 !important; padding: 12px 14px !important; }
+  .hpa-account-list-row .hpa-inline-person { display: block; color: var(--hy-mut); font-size: 11px; font-weight: 700; margin-top: 2px; }
+
+  /* ---- icon / bank picker ---- */
+  .hpa-icon-picker-glyphs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .hpa-icon-picker-banks { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; max-height: 260px; overflow: auto;
+    padding: 2px; border-top: 1px dashed #e6e9f2; padding-top: 12px; }
+  .hpa-icon-opt { border: 1.5px solid #e6e9f2; background: #fff; border-radius: 14px; cursor: pointer; padding: 8px 6px;
+    display: flex; flex-direction: column; align-items: center; gap: 5px; font-family: inherit !important; }
+  .hpa-icon-opt-glyph { width: 46px; height: 46px; justify-content: center; font-size: 22px; border-radius: 50%; }
+  .hpa-icon-opt-bank img { width: 34px; height: 34px; object-fit: contain; }
+  .hpa-icon-opt-bank small { font-size: 9.5px; color: var(--hy-mut); font-weight: 800; line-height: 1.3; text-align: center; }
+  .hpa-icon-opt.is-selected { border-color: var(--hy-pri); background: #f3efff; box-shadow: 0 0 0 3px rgba(108,76,224,.12); }
+
+  /* ---- transaction form: inline (retire the wizard overlay) ---- */
+  .hpa-transaction-form-card.hpa-creating .hpa-form { display: grid !important; }
+  .hpa-transaction-form-card.hpa-creating:after { content: '' !important; display: none !important; }
+  .hpa-transaction-form-card > h2 { display: block !important; }
+  .hpa-mobile-wizard-launch, .hpa-mobile-asset-wizard-launch, .hpa-transaction-wizard, .hpa-asset-wizard { display: none !important; }
+  .hpa-asset-form-card.hpa-creating .hpa-form { display: grid !important; }
+  .hpa-form-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+  .hpa-form label { font-size: 12px !important; color: var(--hy-mut) !important; gap: 6px !important; }
+  .hpa-form input, .hpa-form select, .hpa-form textarea { border-radius: 14px !important; border: 1.5px solid #eaedf5 !important;
+    background: #f7f8fc !important; padding: 12px 12px !important; font-size: 14px !important; color: var(--hy-ink) !important; }
+  .hpa-form .hpa-col-full { grid-column: 1 / -1 !important; }
+  .hpa-transaction-form-card .hpa-btn-primary, .hpa-account-form-details .hpa-btn-primary { width: 100%; justify-content: center;
+    min-height: 50px; border-radius: 16px !important; font-size: 15px !important; font-weight: 900 !important; }
+}

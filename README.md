@@ -41,6 +41,13 @@ Everything the web/desktop app has, in your pocket:
 - 💱 **Rates** (TGJU) · 🗄️ **Archive** a period (+ PDF) · ♻️ recycle bin · 🔒 PIN lock.
 - Jalali calendar & Persian numerals throughout, same **IRANSansX** + **Gramophone** fonts.
 
+## 🆕 New in 1.2.0
+
+- **🎨 Redesigned mobile UI.** A refreshed, cohesive look across the app: a purple **موجودی کل** balance hero with a 3D wallet, four colour-coded quick actions (expense · income · transfer · new invoice), softer cards with consistent spacing, and a floating‑action bottom bar with a raised centre **＋**.
+- **🏦 Bank logos for accounts.** When adding an account you can now pick your **bank's real logo** (Melli, Mellat, Tejarat, Saderat, Sepah, Pasargad, Parsian, and 25+ more) instead of an emoji — and the logo shows throughout the account lists and ledger.
+- **🧾 Correct transaction form.** The step‑wizard is retired in favour of a clean inline form that shows exactly the right fields per type: choosing **تسویه بدهی/چک/طلب** now shows the *which‑obligation* selector (as on the desktop/site), and purchase **items** no longer appear on settlements/transfers.
+- **🔁 Instant sync on connect.** The moment you connect the app to your site, a full two‑way sync runs immediately — and on every launch thereafter.
+
 ## 🆕 New in 1.1.0
 
 - **⬆️ Quick‑access hub in Settings.** The menus that don't fit the compact bottom bar on a phone — **accounts, categories, debts/loans/cheques, receivables, rates** — now live in a tidy grid at the top of **Settings**, so everything is reachable on mobile.

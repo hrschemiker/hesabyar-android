@@ -69,14 +69,16 @@ function account_icon_picker(current) {
 // number display: keep the millions digits full-size, the rest + currency word smaller
 function fmt_money_html(amount, currency) {
   const full = fmt_money(amount, currency);
-  const m = full.match(/^(-?[۰-۹\d,]+)\s*(.*)$/);
-  if (!m) return U.esc_html(full);
-  const digits = m[1], cur = m[2];
-  const groups = digits.replace('-', '').split(',');
-  const neg = digits.charAt(0) === '-' ? '-' : '';
+  const sp = full.lastIndexOf(' ');
+  const numPart = sp >= 0 ? full.slice(0, sp) : full;
+  const cur = sp >= 0 ? full.slice(sp + 1) : '';
+  const bare = numPart.replace(/[-−‎‏]/g, '');
+  const groups = bare.split(/[,٬،]/);
+  const sep = (bare.match(/[,٬،]/) || [','])[0];
+  const neg = (Number(amount) || 0) < 0 ? '−' : '';
   let lead, rest;
-  if (groups.length >= 3) { lead = neg + groups.slice(0, groups.length - 2).join(','); rest = ',' + groups.slice(groups.length - 2).join(','); }
-  else { lead = neg + groups.join(','); rest = ''; }
+  if (groups.length >= 3) { lead = neg + groups.slice(0, groups.length - 2).join(sep); rest = sep + groups.slice(groups.length - 2).join(sep); }
+  else { lead = neg + bare; rest = ''; }
   return '<span class="hy-lead">' + U.esc_html(lead) + '</span>' + (rest ? '<span class="hy-rest">' + U.esc_html(rest) + '</span>' : '') + (cur ? '<span class="hy-cur">' + U.esc_html(cur) + '</span>' : '');
 }
 function transaction_types() {

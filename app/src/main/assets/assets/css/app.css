@@ -99,8 +99,10 @@ input, select, option, optgroup, textarea, button,
     padding-right: calc(10px + var(--hpa-inset-right)) !important;
     box-sizing: border-box;
   }
-  /* sticky headers must stop below the status bar, not under it, when scrolled */
-  .hpa-top { top: calc(8px + var(--hpa-inset-top)) !important; }
+  /* NOTE: .hpa-top is position:relative on mobile, so it must NOT get a `top`
+     offset (that would shift it down over the cards below). The .hpa-app
+     padding-top above already moves the whole app — including the header —
+     clear of the status bar. Only genuinely sticky elements get a top offset. */
   .hpa-tab-sticky-summary { top: calc(10px + var(--hpa-inset-top)) !important; }
   .hpa-toast { top: calc(24px + var(--hpa-inset-top)) !important; }
   /* bottom-anchored UI lifts above the navigation / back-home bar */
